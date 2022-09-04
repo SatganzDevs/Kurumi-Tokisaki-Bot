@@ -7,22 +7,22 @@
 <a href="#"><img title="Kurumi Tokisaki" src="https://img.shields.io/badge/Kurumi Tokisaki-green?colorA=%23ff0000&colorB=%23017e40&style=for-the-badge"></a>
 </p>
 <p align="center">
-<a href="https://github.com/SatganzDevz/followers"><img title="Followers" src="https://img.shields.io/github/followers/riychdwayne?color=red&style=flat-square"></a>
-<a href="https://github.com/SatganzDevz/Kurumi-Tokisaki-Md/stargazers/"><img title="Stars" src="https://img.shields.io/github/stars/SatganzDevz/Kurumi-Tokisaki-Md?color=blue&style=flat-square"></a>
-<a href="https://github.com/SatganzDevz/Kurumi-Tokisaki-Md/network/members"><img title="Forks" src="https://img.shields.io/github/forks/SatganzDevz/Kurumi-Tokisaki-Md?color=red&style=flat-square"></a>
-<a href="https://github.com/SatganzDevz/Kurumi-Tokisaki-Md/watchers"><img title="Watching" src="https://img.shields.io/github/watchers/SatganzDevz/Kurumi-Tokisaki-Md?label=Watchers&color=blue&style=flat-square"></a>
-<a href="https://github.com/SatganzDevz/Kurumi-Tokisaki-Md"><img title="Open Source" src="https://badges.frapsoft.com/os/v2/open-source.svg?v=103"></a>
-<a href="https://github.com/SatganzDevz/Kurumi-Tokisaki-Md/"><img title="Size" src="https://img.shields.io/github/repo-size/SatganzDevz/Kurumi-Tokisaki-Md?style=flat-square&color=green"></a>
+<a href="https://github.com/SatganzDevs/followers"><img title="Followers" src="https://img.shields.io/github/followers/riychdwayne?color=red&style=flat-square"></a>
+<a href="https://github.com/SatganzDevs/Kurumi-Tokisaki-Md/stargazers/"><img title="Stars" src="https://img.shields.io/github/stars/SatganzDevz/Kurumi-Tokisaki-Md?color=blue&style=flat-square"></a>
+<a href="https://github.com/SatganzDevs/Kurumi-Tokisaki-Md/network/members"><img title="Forks" src="https://img.shields.io/github/forks/SatganzDevz/Kurumi-Tokisaki-Md?color=red&style=flat-square"></a>
+<a href="https://github.com/SatganzDevs/Kurumi-Tokisaki-Md/watchers"><img title="Watching" src="https://img.shields.io/github/watchers/SatganzDevz/Kurumi-Tokisaki-Md?label=Watchers&color=blue&style=flat-square"></a>
+<a href="https://github.com/SatganzDevs/Kurumi-Tokisaki-Md"><img title="Open Source" src="https://badges.frapsoft.com/os/v2/open-source.svg?v=103"></a>
+<a href="https://github.com/SatganzDevs/Kurumi-Tokisaki-Md/"><img title="Size" src="https://img.shields.io/github/repo-size/SatganzDevz/Kurumi-Tokisaki-Md?style=flat-square&color=green"></a>
 <a href="https://hits.seeyoufarm.com"><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Friychdwayne%2FKurumi-Tokisaki-Md&count_bg=%2379C83D&title_bg=%23555555&icon=probot.svg&icon_color=%2300FF6D&title=hits&edge_flat=false"/></a>
-<a href="https://github.com/SatganzDevz/Kurumi-Tokisaki-Md/graphs/commit-activity"><img height="20" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg"></a>&nbsp;&nbsp;
+<a href="https://github.com/SatganzDevs/Kurumi-Tokisaki-Bot/graphs/commit-activity"><img height="20" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg"></a>&nbsp;&nbsp;
 </p>
 
 <p align="center">
-  <a href="https://github.com/SatganzDevz/Kurumi-Tokisaki-Md#requirements">Requirements</a> •
-  <a href="https://github.com/SatganzDevz/Kurumi-Tokisaki-Md#instalasi">Installation</a> •
-  <a href="https://github.com/SatganzDevz/Kurumi-Tokisaki-Md#thanks-to">Thanks to</a> •
-  <a href="https://github.com/SatganzDevz/Kurumi-Tokisaki-Md#Official-Group"> Official Group Bot</a> •
-  <a href="https://github.com/SatganzDevz/Kurumi-Tokisaki-Md#donate">Donate</a>
+  <a href="https://github.com/SatganzDevs/Kurumi-Tokisaki-Bot#requirements">Requirements</a> •
+  <a href="https://github.com/SatganzDevs/Kurumi-Tokisaki-Bot#instalasi">Installation</a> •
+  <a href="https://github.com/SatganzDevs/Kurumi-Tokisaki-Bot#thanks-to">Thanks to</a> •
+  <a href="https://github.com/SatganzDevs/Kurumi-Tokisaki-Bot#Official-Group"> Official Group Bot</a> •
+  <a href="https://github.com/SatganzDevs/Kurumi-Tokisaki-Bot#donate">Donate</a>
 </p>
 </div>
 
@@ -50,8 +50,8 @@ https://github.com/clhuang/heroku-buildpack-webp-binaries.git
 termux-setup-storage
 apt update && apt upgrade
 pkg install nodejs git ffmpeg libwebp imagemagick
-git clone https://github.com/SatganzDevz/Kurumi-Tokisaki-Md.git
-cd Kurumi-Tokisaki-Md
+git clone https://github.com/SatganzDevs/Kurumi-Tokisaki-Bot.git
+cd Kurumi-Tokisaki-Bot
 pkg install yarn
 yarn
 npm start
