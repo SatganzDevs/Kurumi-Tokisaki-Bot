@@ -44,7 +44,6 @@ let tebakgambar = []
 
 // Database
 let pendaftar = JSON.parse(fs.readFileSync('./database/user.json'))
-let mess = JSON.parse(fs.readFileSync('./message/response.json'));
 let premium = JSON.parse(fs.readFileSync('./database/premium.json'));
 let balance = JSON.parse(fs.readFileSync('./database/balance.json'));
 let limit = JSON.parse(fs.readFileSync('./database/limit.json'));
@@ -147,7 +146,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
              var button = [{ buttonId: `!ytmp3 ${url}`, buttonText: { displayText: `🎵 Audio (${data.size_mp3})` }, type: 1 }, { buttonId: `!ytmp4 ${url}`, buttonText: { displayText: `🎥 Video (${data.size})` }, type: 1 }]
              conn.sendMessage(from, { caption: `*Title :* ${data.title}\n*Quality :* ${data.quality}\n*Url :* https://youtu.be/${data.id}`, location: { jpegThumbnail: await getBuffer(data.thumb) }, buttons: button, footer: 'Pilih Salah Satu Button Dibawah⬇️', mentions: [sender] })
            }).catch((e) => {
-             conn.sendMessage(from, { text: mess.error.api }, { quoted: msg })
+             conn.sendMessage(from, { text: "Maaf terjadi kesalahan" }, { quoted: msg })
                ownerNumber.map( i => conn.sendMessage(from, { text: `Send Play Error : ${e}` }))
            })
         }
@@ -526,8 +525,31 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 			case prefix+'menu':
 			case prefix+'help':
 			    addCountCmd('#help', sender, _cmd)
-			    var teks = allmenu(sender, prefix, pushname, isOwner, isPremium, balance, limit, limitCount, glimit, gcount)
+			var listMsg = {
+                text: `${ucapanWaktu} @${sender.split("@")[0]}`,
+                buttonText: 'Click Here!',
+                footer: `Kamu Pengguna Wa Original?`,
+                mentions: [sender],
+                sections: [{
+                    title: "PILIH SALAH SATU YA", rows: [
+                    {title: "IYA, AKU PENGGUNA WHATSAPP ORIGINAL",
+                    rowId: `${prefix}menun`
+                    },{
+                    title: "TIDAK, AKU PENGGUNA WHATSAPP GB",
+                    rowId: `${prefix}menud`
+                    },
+                    ]
+                }]
+            }
+            conn.sendMessage(from, listMsg)
+            break
+             case prefix+'menud':
+             var teks = allmenu(sender, prefix, pushname, isOwner, isPremium, balance, limit, limitCount, glimit, gcount)
 			    conn.send5ButImg(from , teks, ` ${setting.author}`, fs.readFileSync('./media/thumb.jpeg'), buttonsDefault, msg)
+			break
+			case prefix+'menun':
+			var teks = allmenu(sender, prefix, pushname, isOwner, isPremium, balance, limit, limitCount, glimit, gcount)
+			   conn.sendMessage(from, {image : fs.readFileSync(setting.pathimg), caption: teks}, { quoted : fdoc })
 				break
             case prefix+'menfess':
             case prefix+'kirim':
@@ -547,7 +569,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 			reply(`sukses mengirim pesan ke ${tujuan}`)
             limitAdd(sender, limit)
             break
-            case 'markread':
+            case prefix+'markread':
             addCountCmd('#markread', sender, _cmd)
            conn.sendMessage(q, {
 				   image: fs.readFileSync('./media/menfess.jpeg'),
@@ -703,13 +725,13 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 			    if (isQuotedSticker && msg.message.extendedTextMessage.contextInfo.quotedMessage.stickerMessage.isAnimated !== true) {
 			    exec(`ffmpeg -i ./${rand1} ./${rand2}`, (err) => {
 			      fs.unlinkSync(`./${rand1}`)
-			      if (err) return reply(mess.error.api)
+			      if (err) return reply("Maaf terjadi kesalahan")
 			      conn.sendMessage(from, { image: { url: `./${rand2}` }}, { quoted: msg })
 			      limitAdd(sender, limit)
 				  fs.unlinkSync(`./${rand2}`)
 			    })
 			    } else {
-			    reply(mess.wait)
+			    reply("_Wait a minute, data is being processed!_")
 		          webp2mp4File(`./${rand1}`).then( data => {
 			       fs.unlinkSync(`./${rand1}`)
 			       conn.sendMessage(from, { video: { url: data.result }}, { quoted: msg })
@@ -736,7 +758,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      return reply(`Kirim atau balas Sticker/Foto/Video/Audio yang ingin dijadikan url dengan caption ${command}`)
                    }
                    if (media !== null) {
-                     reply(mess.wait)
+                     reply("_Wait a minute, data is being processed!_")
                      addCountCmd('#upload', sender, _cmd)
                      var { name, url, size } = await UploadFileUgu(media)
                      size = bytesToSize(size)
@@ -745,7 +767,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      limitAdd(sender, limit)
                      fs.unlinkSync(media)
                    } else {
-                     reply(mess.error.api)
+                     reply("Maaf terjadi kesalahan")
                      fs.unlinkSync(media)
                    }
                    break
@@ -754,7 +776,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                   if (args.length < 2) return reply(`Kirim perintah ${command} https://github.com/riy04`)
                   if (!isUrl(args[1])) return reply(mess.error.Iv)
                   addCountCmd('#ssweb-desktop', sender, _cmd)
-                  reply(mess.wait)
+                  reply("_Wait a minute, data is being processed!_")
                   var fatih = `https://fatiharridho.herokuapp.com/api/tools/ssweb?url=${q}&device=dekstop`
                   conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: fatih }}, { quoted: msg})
                   limitAdd(sender, limit)
@@ -764,7 +786,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                   if (args.length < 2) return reply(`Kirim perintah ${command} https://github.com/riy04`)
                   if (!isUrl(args[1])) return reply(mess.error.Iv)
                   addCountCmd('#ssweb-tablet', sender, _cmd)
-                  reply(mess.wait)
+                  reply("_Wait a minute, data is being processed!_")
                   var fatih = `https://fatiharridho.herokuapp.com/api/tools/ssweb?url=${q}&device=tablet`
                   conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: fatih }}, { quoted: msg})
                   limitAdd(sender, limit)
@@ -774,7 +796,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                   if (args.length < 2) return reply(`Kirim perintah ${command} https://github.com/riy04`)
                   if (!isUrl(args[1])) return reply(mess.error.Iv)
                   addCountCmd('#ssweb-phone', sender, _cmd)
-                  reply(mess.wait)
+                  reply("_Wait a minute, data is being processed!_")
                   var fatih = `https://fatiharridho.herokuapp.com/api/tools/ssweb?url=${q}&device=phone`
                   conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: fatih }}, { quoted: msg})
                   limitAdd(sender, limit)
@@ -784,7 +806,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                   if (args.length < 2) return reply(`Kirim perintah ${command} https://youtube.com/c/Riy04`)
                   if (!isUrl(args[1])) return reply(mess.error.Iv)
                   addCountCmd('#tinyurl', sender, _cmd)
-                  reply(mess.wait)
+                  reply("_Wait a minute, data is being processed!_")
                   var riy = await fetchJson(`https://rest-api-riy.herokuapp.com/api/linkshort/tinyurl?link=${q}`)
                   var teks = `*DONE*\n\n≻ Url Original : ${q}\n≻ Result : ${riy.result}`
                   conn.sendMessage(from, { text: teks }, { quoted: msg })
@@ -795,7 +817,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                   if (args.length < 2) return reply(`Kirim perintah ${command} https://youtube.com/c/Riy04`)
                   if (!isUrl(args[1])) return reply(mess.error.Iv)
                   addCountCmd('#cuttly', sender, _cmd)
-                  reply(mess.wait)
+                  reply("_Wait a minute, data is being processed!_")
                   var riy = await fetchJson(`https://rest-api-riy.herokuapp.com/api/linkshort/cuttly?link=${q}`)
                   var teks = `*DONE*\n\n≻ Url Original : ${q}\n≻ Result : ${riy.result}`
                   conn.sendMessage(from, { text: teks }, { quoted: msg })
@@ -806,7 +828,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                   if (args.length < 2) return reply(`Kirim perintah ${command} https://youtube.com/c/Riy04`)
                   if (!isUrl(args[1])) return reply(mess.error.Iv)
                   addCountCmd('#bitly', sender, _cmd)
-                  reply(mess.wait)
+                  reply("_Wait a minute, data is being processed!_")
                   var riy = await fetchJson(`https://rest-api-riy.herokuapp.com/api/linkshort/bitly?link=${q}`)
                   var teks = `*DONE*\n\n≻ Url Original : ${q}\n≻ Result : ${riy.result}`
                   conn.sendMessage(from, { text: teks }, { quoted: msg })
@@ -826,7 +848,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      return reply(`Kirim atau balas Sticker/Foto dengan caption ${command}`)
                    }
                    if (media !== null) {
-                     reply(mess.wait)
+                     reply("_Wait a minute, data is being processed!_")
                      addCountCmd('#circle', sender, _cmd)
                      var { name, url, size } = await UploadFileUgu(media)
                      size = bytesToSize(size)
@@ -835,7 +857,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      limitAdd(sender, limit)
                      fs.unlinkSync(media)
                    } else {
-                     reply(mess.error.api)
+                     reply("Maaf terjadi kesalahan")
                      fs.unlinkSync(media)
                    }
                    break
@@ -852,7 +874,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      return reply(`Kirim atau balas Sticker/Foto dengan caption ${command}`)
                    }
                    if (media !== null) {
-                     reply(mess.wait)
+                     reply("_Wait a minute, data is being processed!_")
                      addCountCmd('#beautiful', sender, _cmd)
                      var { name, url, size } = await UploadFileUgu(media)
                      size = bytesToSize(size)
@@ -861,7 +883,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      limitAdd(sender, limit)
                      fs.unlinkSync(media)
                    } else {
-                     reply(mess.error.api)
+                     reply("Maaf terjadi kesalahan")
                      fs.unlinkSync(media)
                    }
                    break
@@ -878,7 +900,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      return reply(`Kirim atau balas Sticker/Foto dengan caption ${command}`)
                    }
                    if (media !== null) {
-                     reply(mess.wait)
+                     reply("_Wait a minute, data is being processed!_")
                      addCountCmd('#blur', sender, _cmd)
                      var { name, url, size } = await UploadFileUgu(media)
                      size = bytesToSize(size)
@@ -887,7 +909,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      limitAdd(sender, limit)
                      fs.unlinkSync(media)
                    } else {
-                     reply(mess.error.api)
+                     reply("Maaf terjadi kesalahan")
                      fs.unlinkSync(media)
                    }
                    break
@@ -904,7 +926,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      return reply(`Kirim atau balas Sticker/Foto dengan caption ${command}`)
                    }
                    if (media !== null) {
-                     reply(mess.wait)
+                     reply("_Wait a minute, data is being processed!_")
                      addCountCmd('#darkness', sender, _cmd)
                      var { name, url, size } = await UploadFileUgu(media)
                      size = bytesToSize(size)
@@ -913,7 +935,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      limitAdd(sender, limit)
                      fs.unlinkSync(media)
                    } else {
-                     reply(mess.error.api)
+                     reply("Maaf terjadi kesalahan")
                      fs.unlinkSync(media)
                    }
                    break
@@ -930,7 +952,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      return reply(`Kirim atau balas Sticker/Foto dengan caption ${command}`)
                    }
                    if (media !== null) {
-                     reply(mess.wait)
+                     reply("_Wait a minute, data is being processed!_")
                      addCountCmd('#facepalm', sender, _cmd)
                      var { name, url, size } = await UploadFileUgu(media)
                      size = bytesToSize(size)
@@ -939,7 +961,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      limitAdd(sender, limit)
                      fs.unlinkSync(media)
                    } else {
-                     reply(mess.error.api)
+                     reply("Maaf terjadi kesalahan")
                      fs.unlinkSync(media)
                    }
                    break
@@ -956,7 +978,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      return reply(`Kirim atau balas Sticker/Foto dengan caption ${command}`)
                    }
                    if (media !== null) {
-                     reply(mess.wait)
+                     reply("_Wait a minute, data is being processed!_")
                      addCountCmd('#invert', sender, _cmd)
                      var { name, url, size } = await UploadFileUgu(media)
                      size = bytesToSize(size)
@@ -965,7 +987,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      limitAdd(sender, limit)
                      fs.unlinkSync(media)
                    } else {
-                     reply(mess.error.api)
+                     reply("Maaf terjadi kesalahan")
                      fs.unlinkSync(media)
                    }
                    break
@@ -982,7 +1004,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      return reply(`Kirim atau balas Sticker/Foto dengan caption ${command}`)
                    }
                    if (media !== null) {
-                     reply(mess.wait)
+                     reply("_Wait a minute, data is being processed!_")
                      addCountCmd('#pixelate', sender, _cmd)
                      var { name, url, size } = await UploadFileUgu(media)
                      size = bytesToSize(size)
@@ -991,7 +1013,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      limitAdd(sender, limit)
                      fs.unlinkSync(media)
                    } else {
-                     reply(mess.error.api)
+                     reply("Maaf terjadi kesalahan")
                      fs.unlinkSync(media)
                    }
                    break
@@ -1008,7 +1030,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      return reply(`Kirim atau balas Sticker/Foto dengan caption ${command}`)
                    }
                    if (media !== null) {
-                     reply(mess.wait)
+                     reply("_Wait a minute, data is being processed!_")
                      addCountCmd('#rainbow', sender, _cmd)
                      var { name, url, size } = await UploadFileUgu(media)
                      size = bytesToSize(size)
@@ -1017,7 +1039,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      limitAdd(sender, limit)
                      fs.unlinkSync(media)
                    } else {
-                     reply(mess.error.api)
+                     reply("Maaf terjadi kesalahan")
                      fs.unlinkSync(media)
                    }
                    break
@@ -1034,7 +1056,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      return reply(`Kirim atau balas Sticker/Foto dengan caption ${command}`)
                    }
                    if (media !== null) {
-                     reply(mess.wait)
+                     reply("_Wait a minute, data is being processed!_")
                      addCountCmd('#wanted', sender, _cmd)
                      var { name, url, size } = await UploadFileUgu(media)
                      size = bytesToSize(size)
@@ -1043,7 +1065,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      limitAdd(sender, limit)
                      fs.unlinkSync(media)
                    } else {
-                     reply(mess.error.api)
+                     reply("Maaf terjadi kesalahan")
                      fs.unlinkSync(media)
                    }
                    break
@@ -1060,7 +1082,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      return reply(`Kirim atau balas Sticker/Foto dengan caption ${command}`)
                    }
                    if (media !== null) {
-                     reply(mess.wait)
+                     reply("_Wait a minute, data is being processed!_")
                      addCountCmd('#spongebob', sender, _cmd)
                      var { name, url, size } = await UploadFileUgu(media)
                      size = bytesToSize(size)
@@ -1069,7 +1091,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      limitAdd(sender, limit)
                      fs.unlinkSync(media)
                    } else {
-                     reply(mess.error.api)
+                     reply("Maaf terjadi kesalahan")
                      fs.unlinkSync(media)
                    }
                    break
@@ -1086,7 +1108,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      return reply(`Kirim atau balas Sticker/Foto dengan caption ${command}`)
                    }
                    if (media !== null) {
-                     reply(mess.wait)
+                     reply("_Wait a minute, data is being processed!_")
                      addCountCmd('#patrick', sender, _cmd)
                      var { name, url, size } = await UploadFileUgu(media)
                      size = bytesToSize(size)
@@ -1095,7 +1117,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      limitAdd(sender, limit)
                      fs.unlinkSync(media)
                    } else {
-                     reply(mess.error.api)
+                     reply("Maaf terjadi kesalahan")
                      fs.unlinkSync(media)
                    }
                    break
@@ -1120,7 +1142,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      var media = await conn.downloadAndSaveMediaMessage(msg, 'image', `./sticker/${fileName}`)
                    }
                    if (media !== null) {
-                     reply(mess.wait)
+                     reply("_Wait a minute, data is being processed!_")
                      addCountCmd('#instagram-profile', sender, _cmd)
                      var { name, url, size } = await UploadFileUgu(media)
                      size = bytesToSize(size)
@@ -1129,7 +1151,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      limitAdd(sender, limit)
                      fs.unlinkSync(media)
                    } else {
-                     reply(mess.error.api)
+                     reply("Maaf terjadi kesalahan")
                      fs.unlinkSync(media)
                    }
                    break
@@ -1146,7 +1168,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      var media = await conn.downloadAndSaveMediaMessage(msg, 'image', `./sticker/${fileName}`)
                    }
                    if (media !== null) {
-                     reply(mess.wait)
+                     reply("_Wait a minute, data is being processed!_")
                      addCountCmd('#xnxx-profile', sender, _cmd)
                      var { name, url, size } = await UploadFileUgu(media)
                      size = bytesToSize(size)
@@ -1155,7 +1177,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      limitAdd(sender, limit)
                      fs.unlinkSync(media)
                    } else {
-                     reply(mess.error.api)
+                     reply("Maaf terjadi kesalahan")
                      fs.unlinkSync(media)
                    }
                    break
@@ -1164,7 +1186,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 5) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#gura', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var fatih = `https://fatiharridho.herokuapp.com/api/canvas/gura?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: fatih }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1174,7 +1196,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 5) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#gfx1', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var fatih = `https://fatiharridho.herokuapp.com/api/canvas/gfx1?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: fatih }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1184,7 +1206,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 5) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#gfx2', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var fatih = `https://fatiharridho.herokuapp.com/api/canvas/gfx2?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: fatih }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1194,7 +1216,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 5) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#gfx3', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var fatih = `https://fatiharridho.herokuapp.com/api/canvas/gfx3?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: fatih }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1204,7 +1226,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 5) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#gfx4', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var fatih = `https://fatiharridho.herokuapp.com/api/canvas/gfx4?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: fatih }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1214,7 +1236,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 5) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#gfx5', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var fatih = `https://fatiharridho.herokuapp.com/api/canvas/gfx5?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: fatih }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1232,7 +1254,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      var media = await conn.downloadAndSaveMediaMessage(msg, 'image', `./sticker/${fileName}`)
                    }
                    if (media !== null) {
-                     reply(mess.wait)
+                     reply("_Wait a minute, data is being processed!_")
                      addCountCmd('#custom-gfx-1', sender, _cmd)
                      var { name, url, size } = await UploadFileUgu(media)
                      size = bytesToSize(size)
@@ -1241,7 +1263,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      limitAdd(sender, limit)
                      fs.unlinkSync(media)
                    } else {
-                     reply(mess.error.api)
+                     reply("Maaf terjadi kesalahan")
                      fs.unlinkSync(media)
                    }
                    break
@@ -1263,7 +1285,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      var media = await conn.downloadAndSaveMediaMessage(msg, 'image', `./sticker/${fileName}`)
                    }
                    if (media !== null) {
-                     reply(mess.wait)
+                     reply("_Wait a minute, data is being processed!_")
                      addCountCmd('#custom-gfx-2', sender, _cmd)
                      var { name, url, size } = await UploadFileUgu(media)
                      size = bytesToSize(size)
@@ -1272,7 +1294,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                      limitAdd(sender, limit)
                      fs.unlinkSync(media)
                    } else {
-                     reply(mess.error.api)
+                     reply("Maaf terjadi kesalahan")
                      fs.unlinkSync(media)
                    }
                    break
@@ -1727,7 +1749,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#pencil', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/textpro/pencil?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1737,7 +1759,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#glitch', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/textpro/glitch?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1747,7 +1769,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#black-pink', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/textpro/blackpink?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1757,7 +1779,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#neon', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/textpro/neon?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1767,7 +1789,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#logo-bear', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/textpro/logobear?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1777,7 +1799,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#3d-christmas', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/textpro/3dchristmas?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1793,7 +1815,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (tek1.length > 6) return reply(`Teks 1 kepanjangan`)
                 if (tek2.length > 6) return reply(`Teks 2 kepanjangan`)
                 addCountCmd('#glitch2', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/textpro/glitch2?text=${tek1}&text2=${tek2}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1803,7 +1825,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#thunder', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/textpro/thunder?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1813,7 +1835,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#3d-box-text', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/textpro/3dboxtext?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1829,7 +1851,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (tek1.length > 6) return reply(`Teks 1 kepanjangan`)
                 if (tek2.length > 6) return reply(`Teks 2 kepanjangan`)
                 addCountCmd('#tiktok-logo', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/textpro/glitchtiktok?text=${tek1}&text2=${tek2}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1845,7 +1867,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (tek1.length > 6) return reply(`Teks 1 kepanjangan`)
                 if (tek2.length > 6) return reply(`Teks 2 kepanjangan`)
                 addCountCmd('#video-game-classic', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/textpro/video-game-classic?text=${tek1}&text2=${tek2}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1861,7 +1883,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (tek1.length > 6) return reply(`Teks 1 kepanjangan`)
                 if (tek2.length > 6) return reply(`Teks 2 kepanjangan`)
                 addCountCmd('#ninja-logo', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/textpro/ninja-logo?text=${tek1}&text2=${tek2}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1877,7 +1899,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (tek1.length > 6) return reply(`Teks 1 kepanjangan`)
                 if (tek2.length > 6) return reply(`Teks 2 kepanjangan`)
                 addCountCmd('#marvel-studios', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/textpro/marvel-studios?text=${tek1}&text2=${tek2}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1887,7 +1909,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#green-horror', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/textpro/green-horror?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1897,7 +1919,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#magma', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/textpro/magma?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1907,7 +1929,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#3d-neon-light', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/textpro/3d-neon-light?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1917,7 +1939,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#3d-orange-juice', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/textpro/3d-orange-juice?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1927,7 +1949,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#chocolate-cake', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/textpro/chocolate-cake?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1937,7 +1959,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#strawberry', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/textpro/strawberry?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1948,7 +1970,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#flaming', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/photooxy/flaming?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1958,7 +1980,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#shadow-sky', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/photooxy/shadow-sky?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1968,7 +1990,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#naruto', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/photooxy/naruto?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1984,7 +2006,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (tek1.length > 6) return reply(`Teks 1 kepanjangan`)
                 if (tek2.length > 6) return reply(`Teks 2 kepanjangan`)
                 addCountCmd('#pubg', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/photooxy/pubg?text1=${tek1}&text2=${tek2}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -1994,7 +2016,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#under-grass', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/photooxy/under-grass?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -2004,7 +2026,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#harry-potter', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/photooxy/harry-potter?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -2014,7 +2036,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#flower-typography', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/photooxy/flower-typography?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -2024,7 +2046,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#picture-of-love', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/photooxy/picture-of-love?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -2034,7 +2056,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#coffee-cup', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/photooxy/coffee-cup?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -2044,7 +2066,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#night-sky', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/photooxy/night-sky?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -2054,7 +2076,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#carved-wood', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/photooxy/carved-wood?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -2064,7 +2086,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#illuminated-metallic', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/photooxy/illuminated-metallic?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -2074,7 +2096,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (args.length < 2) return reply(`Kirim perintah ${command} Riy 04`)
                 if (q.length > 10) return reply(`Teksnya kebanyakan`)
                 addCountCmd('#sweet-candy', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var riy = `https://rest-api-riy.herokuapp.com/api/photooxy/sweet-candy?text=${q}`
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: riy }}, { quoted: msg})
                 limitAdd(sender, limit)
@@ -2083,7 +2105,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
             case prefix+'bocil':
                 if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
                 addCountCmd('#bocil', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var data = JSON.parse(fs.readFileSync('./lib/asupan/bocil.json'))
                 data = pickRandom(data)
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', video: { url: data.url }}, { quoted: msg})
@@ -2092,7 +2114,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
              case prefix+'geayubi':
                 if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
                 addCountCmd('#geayubi', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var data = JSON.parse(fs.readFileSync('./lib/asupan/geayubi.json'))
                 data = pickRandom(data)
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', video: { url: data.url }}, { quoted: msg})
@@ -2101,7 +2123,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
              case prefix+'hijaber':
                 if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
                 addCountCmd('#hijaber', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var data = JSON.parse(fs.readFileSync('./lib/asupan/hijaber.json'))
                 data = pickRandom(data)
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', video: { url: data.url }}, { quoted: msg})
@@ -2110,7 +2132,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
              case prefix+'rikagusriani':
                 if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
                 addCountCmd('#rikagusriani', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var data = JSON.parse(fs.readFileSync('./lib/asupan/rikagusriani.json'))
                 data = pickRandom(data)
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', video: { url: data.url }}, { quoted: msg})
@@ -2119,7 +2141,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
              case prefix+'santuy':
                 if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
                 addCountCmd('#santuy', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var data = JSON.parse(fs.readFileSync('./lib/asupan/santuy.json'))
                 data = pickRandom(data)
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', video: { url: data.url }}, { quoted: msg})
@@ -2128,7 +2150,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
              case prefix+'ukhty':
                 if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
                 addCountCmd('#ukhty', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var data = JSON.parse(fs.readFileSync('./lib/asupan/ukhty.json'))
                 data = pickRandom(data)
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', video: { url: data.url }}, { quoted: msg})
@@ -2141,7 +2163,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 			    if (!isUrl(args[1])) return reply(mess.error.Iv)
 			    if (!args[1].includes('tiktok')) return reply(mess.error.Iv)
 			    addCountCmd('#tiktok', sender, _cmd)
-			    reply(mess.wait)
+			    reply("_Wait a minute, data is being processed!_")
 			    var fatih = await fetchJson(`https://fatiharridho.herokuapp.com/api/downloader/tiktok?url=${args[1]}`)
 			      conn.sendMessage(from, {
 				   video: { url: fatih.result.download.no_wm },
@@ -2150,7 +2172,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 				   footer: ` ${setting.author}`
 			      }, { quoted: msg })
 				  limitAdd(sender, limit)
-			    .catch(() => reply(mess.error.api))
+			    .catch(() => reply("Maaf terjadi kesalahan"))
 			    break
 			case prefix+'tiktoknowm':
 			    if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
@@ -2169,7 +2191,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 			    if (!isUrl(args[1])) return reply(mess.error.Iv)
 			    if (!args[1].includes('tiktok')) return reply(mess.error.Iv)
 			    addCountCmd('#tiktokaudio', sender, _cmd)
-			    reply(mess.wait)
+			    reply("_Wait a minute, data is being processed!_")
 			    var riy = await fetchJson(`https://rest-api-riy.herokuapp.com/api/dowloader/tikok?url=${args[1]}`)
 			      conn.sendMessage(from, { audio: { url: riy.result.audio }, mimetype: 'audio/mp4' }, { quoted: msg })
 			       limitAdd(sender, limit)
@@ -2178,7 +2200,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 			    if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
                 if (args.length < 2) return reply(`Kirim perintah ${command} query\nContoh : ${command} monokrom`)
                 addCountCmd('#play', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 await sendPlay(from, q)
 				limitAdd(sender, limit)
                 break
@@ -2188,7 +2210,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 			    if (!isUrl(args[1])) return reply(mess.error.Iv)
 			    if (!args[1].includes('youtu.be') && !args[1].includes('youtube.com')) return reply(mess.error.Iv)
 			    addCountCmd('#ytmp4', sender, _cmd)
-			    reply(mess.wait)
+			    reply("_Wait a minute, data is being processed!_")
 			    var riy = await fetchJson(`https://rest-api-riy.herokuapp.com/api/dowloader/yt?url=${args[1]}`)
 			      var teks = `*Youtube Video Downloader*\n\n*≻ Title :* ${riy.result.title}\n*≻ Quality :* -\n*≻ Size :* ${riy.result.filesize}\n*≻ Url Source :* ${args[1]}`
 			      conn.sendMessage(from, { video: { url: riy.result.mp4 }, caption: teks }, { quoted: msg })
@@ -2200,7 +2222,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 			    if (!isUrl(args[1])) return reply(mess.error.Iv)
 			    if (!args[1].includes('youtu.be') && !args[1].includes('youtube.com')) return reply(mess.error.Iv)
 			    addCountCmd('#ytmp4', sender, _cmd)
-			    reply(mess.wait)
+			    reply("_Wait a minute, data is being processed!_")
 			    var riy = await fetchJson(`https://rest-api-riy.herokuapp.com/api/dowloader/yt?url=${args[1]}`)
 			      var teks = `*Youtube Audio Downloader*\n\n*≻ Title :* ${riy.result.Title}\n*≻ Quality :* -\n*≻ Size :* ${riy.result.filesize}\n*≻ Url Source :* ${args[1]}\n\n_wait a minute sending media..._`
 			      conn.sendMessage(from, { image: { url: riy.result.thumb }, caption: teks }, { quoted: msg })
@@ -2219,12 +2241,12 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (isNaN(args[1])) return reply(`Hanya support angka! pilih angka 1 sampai 10\nContoh : ${command} 2`)
                 if (args[1] > arrey.length) return reply(`Urutan Hasil *${prefix}ytsearch* Hanya Sampai *${arrey.length}*`)
                 addCountCmd('#getvideo', sender, _cmd)
-			    reply(mess.wait)
+			    reply("_Wait a minute, data is being processed!_")
 			    xfar.downloader.youtube(`https://youtube.com/watch?v=${arrey[args[1] -1]}`).then( data => {
 			      var teks = `*Youtube Video Downloader*\n\n*≻ Title :* ${data.title}\n*≻ Quality :* ${data.medias[1].quality}\n*≻ Size :* ${data.medias[1].formattedSize}\n*≻ Url Source :* ${data.url}\n\n_wait a minute sending media..._`
 			      conn.sendMessage(from, { video: { url: data.medias[1].url }, caption: teks }, { quoted: msg })
 			       limitAdd(sender, limit)
-				}).catch(() => reply(mess.error.api))
+				}).catch(() => reply("Maaf terjadi kesalahan"))
 		        break
 			case prefix+'getmusik': case prefix+'getmusic':
 			    if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
@@ -2238,13 +2260,13 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                 if (isNaN(args[1])) return reply(`Hanya support angka! pilih angka 1 sampai 10\nContoh : ${command} 2`)
                 if (args[1] > arrey.length) return reply(`Urutan Hasil *${prefix}ytsearch* Hanya Sampai *${arrey.length}*`)
                 addCountCmd('#getmusic', sender, _cmd)
-			    reply(mess.wait)
+			    reply("_Wait a minute, data is being processed!_")
 			    xfar.downloader.youtube(`https://youtube.com/watch?v=${arrey[args[1] -1]}`).then( data => {
 			      var teks = `*Youtube Audio Downloader*\n\n*≻ Title :* ${data.title}\n*≻ Quality :* ${data.medias[7].quality}\n*≻ Size :* ${data.medias[7].formattedSize}\n*≻ Url Source :* ${data.url}\n\n_wait a minute sending media..._`
 			      conn.sendMessage(from, { image: { url: data.thumbnail }, caption: teks }, { quoted: msg })
 			      conn.sendMessage(from, { document: { url: data.medias[7].url }, fileName: `${data.title}.mp3`, mimetype: 'audio/mp3' }, { quoted: msg })
 			      limitAdd(sender, limit)
-				}).catch(() => reply(mess.error.api))
+				}).catch(() => reply("Maaf terjadi kesalahan"))
 			    break
 			case prefix+'igdl': case prefix+'instagram': case prefix+'ig':
 			    if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
@@ -2252,7 +2274,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 			    if (!isUrl(args[1])) return reply(mess.error.Iv)
 			    if (!args[1].includes('instagram.com')) return reply(mess.error.Iv)
 			    addCountCmd('#instagram', sender, _cmd)
-			    reply(mess.wait)
+			    reply("_Wait a minute, data is being processed!_")
 			    xfar.downloader.instagram(args[1]).then( data => {
 			     var teks = `*Instagram Downloader*\n\n*≻ Title :* ${data.title}\n*≻ Jumlah Media :* ${data.medias.length}\n*≻ Url Source :* ${data.url}\n\n_wait a minute sending media..._`
 			     reply(teks)
@@ -2264,7 +2286,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 			      }
 			     }
 				 limitAdd(sender, limit)
-			    }).catch(() => reply(mess.error.api))
+			    }).catch(() => reply("Maaf terjadi kesalahan"))
 			    break
 			case prefix+'facebook': case prefix+'fbdl':
 			    if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
@@ -2272,7 +2294,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 			    if (!isUrl(args[1])) return reply(mess.error.Iv)
 			    if (!args[1].includes('facebook.com')) return reply(mess.error.Iv)
 			    addCountCmd('#facebook', sender, _cmd)
-			    reply(mess.wait)
+			    reply("_Wait a minute, data is being processed!_")
 			    var riy = await fetchJson(`https://rest-api-riy.herokuapp.com/api/dowloader/fbdown?url=${args[1]}`)
 			      conn.sendMessage(from, { video: { url: riy.result.url }, caption: riy.result.title }, { quoted: msg })
 			      limitAdd(sender, limit)
@@ -2361,7 +2383,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 			case prefix+'cecan': case prefix+'cewek':
 			    if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
 			    addCountCmd('#cecan', sender, _cmd)
-				reply(mess.wait)
+				reply("_Wait a minute, data is being processed!_")
 			    var query = ["cecan hd","cecan indo","cewe cantik", "cewe aesthetic", "cecan aesthetic"]
                 var data = await pinterest(pickRandom(query))
 				var but = [{buttonId: `${command}`, buttonText: { displayText: "Next Photo" }, type: 1 }]
@@ -2371,7 +2393,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 			case prefix+'cogan': case prefix+'cowok':
 			    if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
 			    addCountCmd('#cogan', sender, _cmd)
-				reply(mess.wait)
+				reply("_Wait a minute, data is being processed!_")
 				var query = ["cogan hd","cogan indo","cowo ganteng","handsome boy","hot boy","oppa","cowo aesthetic","cogan aesthetic"]
 				var data = await pinterest(pickRandom(query))
 				var but = [{buttonId: `${command}`, buttonText: { displayText: "Next Photo" }, type: 1 }]
@@ -2381,7 +2403,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
             case prefix+'ppcouple': case prefix+'ppcp':
                 if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
                 addCountCmd('#ppcouple', sender, _cmd)
-                reply(mess.wait)
+                reply("_Wait a minute, data is being processed!_")
                 var data = await fetchJson(`https://rest-api-riy.herokuapp.com/api/randomgambar/couplepp`)
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: data.result.male }}, { quoted: msg})
                 conn.sendMessage(from, { caption: 'Dont Forget Subscribe\nhttps://youtube.com/c/Riy', image: { url: data.result.female }}, { quoted: msg})
@@ -2392,7 +2414,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 			    if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
 				if (args.length < 2) return reply(`Kirim perintah ${command} judul lagu`)
 				addCountCmd('#lirik', sender, _cmd)
-				reply(mess.wait)
+				reply("_Wait a minute, data is being processed!_")
 			    ra.Musikmatch(q).then(async(data) => {
 				  var teks = `*${data.result.judul} - ${data.result.penyanyi}*\n\n${data.result.lirik}`
 				  conn.sendMessage(from, { image: { url: data.result.thumb }, caption: teks }, { quoted: msg })
@@ -2403,7 +2425,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 			    if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
 				if (args.length < 2) return reply(`Kirim perintah ${command} nama grup`)
 				addCountCmd('#grupwa', sender, _cmd)
-				reply(mess.wait)
+				reply("_Wait a minute, data is being processed!_")
 			    hxz.linkwa(q).then(async(data) => {
 				  if (data.length == 0) return reply(`Grup ${q} tidak ditemukan`)
 				  var teks = `*Hasil Pencarian Dari ${q}*\n\n`
@@ -2412,13 +2434,13 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 				  }
 				  reply(teks)
 				  limitAdd(sender, limit)
-				}).catch(() => reply(mess.error.api))
+				}).catch(() => reply("Maaf terjadi kesalahan"))
 			    break
 			case prefix+'pinterest':
 			    if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
 				if (args.length < 2) return reply(`Kirim perintah ${command} query atau ${command} query --jumlah\nContoh :\n${command} cecan atau ${command} cecan --10`)
 				addCountCmd('#pinterest', sender, _cmd)
-				reply(mess.wait)
+				reply("_Wait a minute, data is being processed!_")
 			    var jumlah;
 			    if (q.includes('--')) jumlah = q.split('--')[1]
 			    pinterest(q.replace('--'+jumlah, '')).then(async(data) => {
@@ -2442,7 +2464,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 			    if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
 			    if (args.length < 2) return reply(`Kirim perintah ${command} query`)
 			    addCountCmd('#ytsearch', sender, _cmd)
-				reply(mess.wait)
+				reply("_Wait a minute, data is being processed!_")
 			    yts(q).then( data => {
 				  let yt = data.videos
 				  var jumlah = 15
@@ -2462,7 +2484,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 				}
 				conn.sendMessage(from, { image: { url: yt[0].image }, caption: txt }, { quoted: msg })
 				limitAdd(sender, limit)
-				}).catch(() => reply(mess.error.api))
+				}).catch(() => reply("Maaf terjadi kesalahan"))
 			    break
 			// Game Menu
 			case prefix+'tictactoe': case prefix+'ttt': case prefix+'ttc':
@@ -2533,7 +2555,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 			    if (!isGroup) return reply(mess.OnlyGrup)
 				if (!isBotGroupAdmins) return reply(mess.BotAdmin)
 				addCountCmd('#linkgc', sender, _cmd)
-				var url = await conn.groupInviteCode(from).catch(() => reply(mess.error.api))
+				var url = await conn.groupInviteCode(from).catch(() => reply("Maaf terjadi kesalahan"))
 			    url = 'https://chat.whatsapp.com/'+url
 				reply(url)
 				break
@@ -2548,7 +2570,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 				  .then( res => {
 					reply(`Sukses`)
 					fs.unlinkSync(media)
-				  }).catch(() => reply(mess.error.api))
+				  }).catch(() => reply("Maaf terjadi kesalahan"))
 				} else {
 			      reply(`Kirim/balas gambar dengan caption ${command}`)
 				}
@@ -2562,7 +2584,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 				await conn.groupUpdateSubject(from, q)
 			    .then( res => {
 				  reply(`Sukses`)
-				}).catch(() => reply(mess.error.api))
+				}).catch(() => reply("Maaf terjadi kesalahan"))
 			    break
 			case prefix+'setdesc': case prefix+'setdescription':
 			    if (!isGroup) return reply(mess.OnlyGrup)
@@ -2573,7 +2595,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 				await conn.groupUpdateDescription(from, q)
 			    .then( res => {
 			      reply(`Sukses`)
-				}).catch(() => reply(mess.error.api))
+				}).catch(() => reply("Maaf terjadi kesalahan"))
 				break
 			case prefix+'group': case prefix+'grup':
 		        if (!isGroup) return reply(mess.OnlyGrup)
@@ -2599,7 +2621,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 				await conn.groupRevokeInvite(from)
 			    .then( res => {
 				  reply(`Sukses menyetel tautan undangan grup ini`)
-				}).catch(() => reply(mess.error.api))
+				}).catch(() => reply("Maaf terjadi kesalahan"))
 				break
             case prefix+'tagall': case prefix+'infoall':
                    if (!isGroup) return reply(mess.OnlyGrup)
