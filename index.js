@@ -102,7 +102,7 @@ const connectToWhatsApp = async () => {
 	
 	conn.multi = true
 	conn.nopref = false
-	conn.prefa = '.'
+	conn.prefa = ''
 	conn.ev.on('messages.upsert', async m => {
 		if (!m.messages) return;
 		var msg = m.messages[0]
@@ -147,6 +147,23 @@ const connectToWhatsApp = async () => {
         })
 
 	conn.reply = (from, content, msg) => conn.sendMessage(from, { text: content }, { quoted: msg })
+    // Set Bio
+      conn.setStatus = (status) => {
+        conn.query({
+            tag: 'iq',
+            attrs: {
+                to: '@s.whatsapp.net',
+                type: 'set',
+                xmlns: 'status',
+            },
+            content: [{
+                tag: 'status',
+                attrs: {},
+                content: Buffer.from(status, 'utf-8')
+            }]
+        })
+        return status
+    }
     
     conn.downloadAndSaveMediaMessage = async(msg, type_file, path_file) => {
            if (type_file === 'image') {
@@ -183,18 +200,7 @@ const connectToWhatsApp = async () => {
              return path_file
            }
         }
-        // Generate PP
-        conn.generateProfilePicture = async (buffer) => {
-     let jimp = require('jimp')
-	 let elon = await jimp.read(buffer)
-	let min = jimp.getWidth()
-	let max = jimp.getHeight()
-	let cropped = elon.crop(0, 0, min, max)
-	return {
-		img: await cropped.scaleToFit(720, 720).getBufferAsync(jimp.MIME_JPEG),
-		preview: await cropped.scaleToFit(720, 720).getBufferAsync(jimp.MIME_JPEG)
-	}
-}
+        
         // Resize
        conn.reSize = async (image, width, height) => {
        let jimp = require('jimp')
@@ -202,24 +208,7 @@ const connectToWhatsApp = async () => {
        var kiyomasa = await oyy.resize(width, height).getBufferAsync(jimp.MIME_JPEG)
        return kiyomasa
       }
-      // Set Bio
-      conn.setStatus = (status) => {
-        conn.query({
-            tag: 'iq',
-            attrs: {
-                to: '@s.whatsapp.net',
-                type: 'set',
-                xmlns: 'status',
-            },
-            content: [{
-                tag: 'status',
-                attrs: {},
-                content: Buffer.from(status, 'utf-8')
-            }]
-        })
-        return status
-    }
-    
+      
       // Send 5 Button Location
       conn.send5ButLoc = async (jid , text = '' , footer = '', lok, but = [], options = {}) =>{
        let resize = await conn.reSize(lok, 300, 150)
@@ -229,7 +218,8 @@ const connectToWhatsApp = async () => {
        "locationMessage": {
        "degreesLatitude": 0,
        "degreesLongitude": 0,
-       "jpegThumbnail": rezize
+       "jpegThumbnail": resize,
+       "thumbnailUrl": setting.group
        },
        "hydratedContentText": text,
        "hydratedFooterText": footer,
@@ -239,36 +229,7 @@ const connectToWhatsApp = async () => {
        }, options)
        conn.relayMessage(jid, template.message, { messageId: template.key.id })
       }
-      // Send 5 But Img
-      conn.send5ButImg = async (jid , text = '' , footer = '', img, but = [], options = {}) =>{
-        let message = await prepareWAMessageMedia({ image: img }, { upload: conn.waUploadToServer })
-        var template = generateWAMessageFromContent(jid, proto.Message.fromObject({
-        templateMessage: {
-        hydratedTemplate: {
-        imageMessage: message.imageMessage,
-               "hydratedContentText": text,
-               "hydratedFooterText": footer,
-               "hydratedButtons": but
-            }
-            }
-            }), options)
-            conn.relayMessage(jid, template.message, { messageId: template.key.id })
-    }
-       // Send 5 But Gif
-      conn.send5ButGif = async (jid , text = '' , footer = '', gif, but = [], options = {}) =>{
-        let message = await prepareWAMessageMedia({ video: gif, gifPlayback: true }, { upload: conn.waUploadToServer })
-        var template = generateWAMessageFromContent(jid, proto.Message.fromObject({
-        templateMessage: {
-        hydratedTemplate: {
-        videoMessage: message.videoMessage,
-               "hydratedContentText": text,
-               "hydratedFooterText": footer,
-               "hydratedButtons": but
-            }
-            }
-            }), options)
-            conn.relayMessage(jid, template.message, { messageId: template.key.id })
-    }
+
 	return conn
 }
 

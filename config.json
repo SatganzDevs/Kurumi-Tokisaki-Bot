@@ -4,11 +4,12 @@
 "botName": "Kurumi Tokisaki-Md",
 "packname": "Kurumi Tokisaki-Md",
 "author": "© Satganz Devs | 2022",
+"footext": "© ꜱᴀᴛɢᴀɴᴢ ᴅᴇᴠꜱ",
 "sessionName": "session",
-"pathimg": "./media/thumb.jpeg",
+"pathimg": "https://raw.githubusercontent.com/SatganzDevs/THUMBNAIL/master/THUMB/thumb10.jpg",
 
 "medsos": {
-"group": "-",
+"group": "https://chat.whatsapp.com/EJYvWGEmAjIC0EEoGm0NVq",
 "instagram": "https://instagram.com/satganzdevs.xyz"
 },
 
